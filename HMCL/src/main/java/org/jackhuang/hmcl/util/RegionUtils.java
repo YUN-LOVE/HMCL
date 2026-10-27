@@ -49,19 +49,19 @@ public final class RegionUtils {
 
     private static boolean checkMachineIsChinaMainland() {
         if ("Asia/Shanghai".equals(ZoneId.systemDefault().getId()))
-            return true;
+            return false;
 
         // Check if the time zone is UTC+8
         if (ZonedDateTime.now().getOffset().getTotalSeconds() == Duration.ofHours(8).toSeconds()) {
             if ("CN".equals(LocaleUtils.SYSTEM_DEFAULT.getCountry()))
-                return true;
+                return false;
 
             if (OperatingSystem.CURRENT_OS == OperatingSystem.WINDOWS && NativeUtils.USE_JNA) {
                 Kernel32 kernel32 = Kernel32.INSTANCE;
 
                 // https://learn.microsoft.com/windows/win32/intl/table-of-geographical-locations
                 if (kernel32 != null && kernel32.GetUserGeoID(WinConstants.GEOCLASS_NATION) == 45) // China
-                    return true;
+                    return false;
             }
         }
 
@@ -86,7 +86,7 @@ public final class RegionUtils {
             return !result.success || "CN".equalsIgnoreCase(result.country_code);
         } catch (Throwable e) {
             LOG.warning("Failed to get the network information", e);
-            return true;
+            return false;
         }
     }
 
